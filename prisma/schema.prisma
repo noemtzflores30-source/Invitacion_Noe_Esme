@@ -1,0 +1,92 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+model EventConfig {
+  id                String   @id @default("main")
+  eventDate         String   @default("2027-01-30")
+  venueName         String   @default("Por confirmar")
+  venueAddress      String   @default("")
+  venueMapUrl       String   @default("")
+  venueLat          String   @default("18.8994602")
+  venueLng          String   @default("-99.2137462")
+  ceremonyTime      String   @default("16:00")
+  receptionTime     String   @default("19:00")
+  itinerary         String   @default("[]")
+  primaryDeadline   String?
+  secondaryDeadline String?
+  coverImageUrl     String   @default("")
+  galleryImages     String   @default("[]")
+  dressCode         String   @default("Formal")
+  additionalInfo    String   @default("")
+  blessingText      String   @default("Con la bendición de Dios y de nuestras familias, hemos decidido unir nuestras vidas. Será un honor contar con su presencia en este día tan especial.")
+  monogramImageUrl  String   @default("")
+  brideFatherName   String   @default("Rodolfo De los Santos Gilbón")
+  brideMotherName   String   @default("Belem Sedano Ortega")
+  groomFatherName   String   @default("Héctor Leonardo Martínez Solís")
+  groomMotherName   String   @default("Rafaela Flores De los Santos")
+  dressCodeDetail   String   @default("Vestido largo para ellas, traje formal para ellos. Les pedimos amablemente reservar para la novia los tonos que se muestran a continuación.")
+  prohibitedColors  String   @default("[{\"name\":\"Blanco\",\"hex\":\"#ffffff\"},{\"name\":\"Vino\",\"hex\":\"#61081b\"}]")
+  giftMessage       String   @default("Si deseas contribuir de alguna manera, estamos ahorrando para algo especial. Si gustas, tu aporte en efectivo sería genial. No te preocupes, el sobre estará en la mesa.")
+  noticeTitle       String   @default("Cuidado del recinto")
+  noticeText        String   @default("Con el fin de preservar este hermoso espacio donde compartiremos un día tan especial, agradecemos a los padres y tutores su apoyo supervisando a los menores en todo momento. Les recordamos que cualquier daño ocasionado a las instalaciones, mobiliario u objetos del recinto deberá ser cubierto por la persona responsable.")
+  updatedAt         DateTime @updatedAt
+}
+
+model Invitation {
+  id             String            @id @default(uuid())
+  titularName    String
+  invitedBy      String
+  status         String            @default("PENDING")
+  deadlineType   String            @default("PRIMARY")
+  notes          String?
+  guestMessage   String?
+  autoRejectedAt DateTime?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  persons        InvitedPerson[]
+  tableAssignments TableAssignment[]
+}
+
+model InvitedPerson {
+  id              String           @id @default(cuid())
+  invitationId    String
+  invitation      Invitation       @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  name            String
+  isChild         Boolean          @default(false)
+  status          String           @default("PENDING")
+  rejectionReason String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  tableAssignment TableAssignment?
+}
+
+model WeddingTable {
+  id          String            @id @default(cuid())
+  tableNumber Int               @unique
+  name        String?
+  assignments TableAssignment[]
+}
+
+model TableAssignment {
+  id           String        @id @default(cuid())
+  tableId      String
+  table        WeddingTable  @relation(fields: [tableId], references: [id])
+  personId     String        @unique
+  person       InvitedPerson @relation(fields: [personId], references: [id], onDelete: Cascade)
+  invitationId String
+  invitation   Invitation    @relation(fields: [invitationId], references: [id])
+  seatNumber   Int?
+  assignedAt   DateTime      @default(now())
+}

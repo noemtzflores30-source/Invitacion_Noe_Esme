@@ -1,36 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Invitación Noe & Esme
 
-## Getting Started
+Invitación de boda digital con panel de administración — gestión de invitados, mesas, RSVP y contenido del evento, todo editable sin redesplegar.
 
-First, run the development server:
+## Stack
+
+- **Next.js 16** (App Router, Turbopack) + TypeScript
+- **Tailwind CSS v4**
+- **Prisma 7** — SQLite en desarrollo, pensado para migrar a **Supabase** (Postgres) en producción
+- **Cloudinary** — subida/optimización de imágenes desde el panel de admin
+- Autenticación de admin con JWT (cookie), sin dependencias externas de auth
+
+## Desarrollo local
 
 ```bash
+npm install
+npx prisma migrate dev
+npx ts-node --compiler-options '{"module":"CommonJS"}' prisma/seed.ts
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abre [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Invitación genérica: `/invite`
+- Invitación personalizada: `/invite/{uuid}`
+- Panel de administración: `/admin/login`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Variables de entorno
 
-## Learn More
+Copia `.env` y completa (ver `.env` en el repo para la lista completa):
 
-To learn more about Next.js, take a look at the following resources:
+- `DATABASE_URL`, `JWT_SECRET`, `ADMIN_USERNAME`, `ADMIN_PASSWORD`
+- `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`, `NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET` — cuenta gratuita en [cloudinary.com](https://cloudinary.com), preset de subida en modo *Unsigned*
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Notas
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- La base de datos local (`dev.db`) no se sube al repositorio — contiene datos reales de invitados.
