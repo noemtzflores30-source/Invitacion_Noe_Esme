@@ -2,6 +2,10 @@ import { prisma } from '@/lib/prisma'
 import { MAX_GUESTS, countPersonSlots, countConfirmedSlots } from '@/lib/utils'
 import DashboardClient from '@/components/admin/DashboardClient'
 
+// Always fetch fresh data — this page reads live DB state, must never be
+// statically prerendered at build time (would freeze admin edits / RSVPs).
+export const dynamic = 'force-dynamic'
+
 async function getStats() {
   const invitations = await prisma.invitation.findMany({
     include: { persons: true },

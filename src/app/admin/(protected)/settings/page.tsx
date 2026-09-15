@@ -1,6 +1,10 @@
 import { prisma } from '@/lib/prisma'
 import SettingsClient from '@/components/admin/SettingsClient'
 
+// Always fetch fresh data — this page reads live DB state, must never be
+// statically prerendered at build time (would freeze admin edits / RSVPs).
+export const dynamic = 'force-dynamic'
+
 export default async function SettingsPage() {
   const config = await prisma.eventConfig.findUnique({ where: { id: 'main' } })
   const parsed = config ? {

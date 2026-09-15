@@ -1,6 +1,10 @@
 import { prisma } from '@/lib/prisma'
 import InvitationView from '@/components/invitation/InvitationView'
 
+// Always fetch fresh data — this page reads live DB state, must never be
+// statically prerendered at build time (would freeze admin edits / RSVPs).
+export const dynamic = 'force-dynamic'
+
 export default async function GenericInvitePage() {
   const config = await prisma.eventConfig.findUnique({ where: { id: 'main' } })
   const configData = config ? {

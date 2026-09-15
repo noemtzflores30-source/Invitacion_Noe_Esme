@@ -2,6 +2,10 @@ import GuestForm from '@/components/admin/GuestForm'
 import { prisma } from '@/lib/prisma'
 import { MAX_GUESTS, countPersonSlots } from '@/lib/utils'
 
+// Always fetch fresh data — this page reads live DB state, must never be
+// statically prerendered at build time (would freeze admin edits / RSVPs).
+export const dynamic = 'force-dynamic'
+
 async function getAvailableSlots() {
   const persons = await prisma.invitedPerson.findMany()
   const nonRejected = persons.filter(p => p.status !== 'REJECTED')

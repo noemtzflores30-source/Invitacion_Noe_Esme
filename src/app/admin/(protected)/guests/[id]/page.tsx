@@ -3,6 +3,10 @@ import { notFound } from 'next/navigation'
 import { MAX_GUESTS, countPersonSlots } from '@/lib/utils'
 import GuestDetailClient from '@/components/admin/GuestDetailClient'
 
+// Always fetch fresh data — this page reads live DB state, must never be
+// statically prerendered at build time (would freeze admin edits / RSVPs).
+export const dynamic = 'force-dynamic'
+
 async function getData(id: string) {
   const invitation = await prisma.invitation.findUnique({
     where: { id },

@@ -2,6 +2,10 @@ import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import InvitationView from '@/components/invitation/InvitationView'
 
+// Always fetch fresh data — this page reads live DB state, must never be
+// statically prerendered at build time (would freeze admin edits / RSVPs).
+export const dynamic = 'force-dynamic'
+
 export default async function PersonalizedInvitePage({
   params,
 }: {
