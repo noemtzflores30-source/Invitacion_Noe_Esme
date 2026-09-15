@@ -8,10 +8,10 @@
 
 - **Next.js 16** (App Router, Turbopack) + TypeScript
 - **Tailwind CSS v4**
-- **Prisma 7** sobre **SQLite** en desarrollo (`dev.db`, no versionado — contiene datos reales de invitados). Producción pensada para **Supabase** (Postgres) — *migración aún no realizada*.
+- **Prisma 7.10** sobre **PostgreSQL (Supabase)** — usado tanto en local como en producción (ya no hay SQLite en el proyecto; se migró por completo el 2026-09-15). Driver adapter `@prisma/adapter-pg` (`pg`). Local usa la cadena de **conexión directa** (puerto 5432); en Vercel, `DATABASE_URL` debe apuntar a la cadena de **Transaction pooler** (puerto 6543, con `?pgbouncer=true`) porque esta versión de Prisma no soporta un `directUrl` separado para migraciones — las migraciones siempre se corren contra la conexión directa, nunca contra el pooler.
 - Autenticación de admin propia: JWT en cookie (`jose`) + `bcryptjs`, sin NextAuth ni proveedor externo.
 - **Cloudinary** (plan gratuito) para subida y optimización de imágenes desde el panel — se eligió sobre Supabase Storage por su cuota gratuita más amplia (25GB vs 1GB) y por incluir optimización automática (`f_auto,q_auto`) sin trabajo adicional.
-- Despliegue objetivo: **Vercel** (frontend) + Supabase (DB), aún no configurado.
+- Despliegue objetivo: **Vercel** (frontend), aún no configurado. La base de datos (Supabase) ya está lista.
 
 ## Qué existe hoy
 
@@ -36,12 +36,19 @@ Vista basada 1:1 en un diseño de Claude Design importado (paleta crema/dorado/m
 - El mapa embebido usaba una búsqueda de texto (`venueAddress`) que quedaba muy alejada del lugar real; ahora usa coordenadas (`venueLat`/`venueLng`) que producen un pin exacto.
 - Espaciado pegado entre la sección de "Invitados" y el aviso de "Fecha límite" (padding superior en 0 por error).
 
+### Migración a Supabase (2026-09-15)
+- `schema.prisma`: `provider` de `sqlite` → `postgresql`.
+- `lib/prisma.ts` y `prisma/seed.ts`: adaptador `PrismaBetterSqlite3` → `PrismaPg`.
+- `package.json`: fuera `better-sqlite3`/`@prisma/adapter-better-sqlite3`; dentro `pg`/`@prisma/adapter-pg`; `prisma`/`@prisma/client` alineados a `7.10.0` (tenían que coincidir con la versión del adapter, si no fallan en runtime).
+- Migraciones viejas de SQLite eliminadas (SQL específico de ese motor, no sirve en Postgres) y se generó un historial nuevo (`prisma/migrations/<timestamp>_init`) directo contra Supabase.
+- `dev.db` ya no se usa — el archivo puede borrarse localmente cuando se quiera, sigue en `.gitignore` por si acaso.
+- Verificado en el navegador: login de admin, Dashboard y la invitación (`/invite`) cargan correctamente contra la base de Supabase ya sembrada (admin, `EventConfig`, 19 mesas).
+
 ## Pendiente / no resuelto todavía
 
-- **Migrar de SQLite a Supabase** para producción — sigue siendo el plan, no iniciado.
-- **Desplegar a Vercel** — no configurado aún (dominio, variables de entorno de producción, etc.).
+- **Desplegar a Vercel** — no configurado aún. Falta: crear el proyecto en Vercel, y en sus variables de entorno de producción usar el `DATABASE_URL` del **Transaction pooler** de Supabase (puerto 6543 + `?pgbouncer=true`), NO la conexión directa que se usa en local — el pooler es necesario porque las funciones serverless abren muchas conexiones cortas y la conexión directa tiene un límite bajo.
 - Campo `coverImageUrl` (Config/Settings, sección "Imágenes") **no se usa en ningún lado de la vista actual de la invitación** — quedó huérfano de una iteración anterior al diseño de Claude Design. Pendiente decidir: ¿se elimina o se reconecta como fondo de la Portada?
 - Sin pruebas automatizadas.
 - El push a GitHub del historial hasta este punto se hizo con un Personal Access Token que el usuario debe generar y usar él mismo (Claude no maneja tokens/contraseñas por política) — confirmar que quedó publicado y, si el token se compartió en el chat, rotarlo por seguridad.
 
-_Última actualización: 2026-09-14._
+_Última actualización: 2026-09-15._
