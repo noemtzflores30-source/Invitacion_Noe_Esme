@@ -45,7 +45,7 @@ export default function GuestsListClient({ invitations }: { invitations: Invitat
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="font-serif text-3xl" style={{ color: 'var(--brown-dark)' }}>Invitados</h1>
           <p className="text-sm mt-1" style={{ color: 'var(--brown-mid)' }}>
@@ -96,6 +96,11 @@ export default function GuestsListClient({ invitations }: { invitations: Invitat
 
       {/* Table */}
       <div className="bg-white rounded-2xl shadow-sm overflow-hidden" style={{ border: '1px solid var(--border)' }}>
+        {filtered.length === 0 ? (
+          <div className="py-12 text-center text-sm" style={{ color: 'var(--brown-mid)' }}>
+            No se encontraron invitados
+          </div>
+        ) : (
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -108,14 +113,7 @@ export default function GuestsListClient({ invitations }: { invitations: Invitat
               </tr>
             </thead>
             <tbody className="divide-y" style={{ borderColor: 'var(--border)' }}>
-              {filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="py-12 text-center text-sm" style={{ color: 'var(--brown-mid)' }}>
-                    No se encontraron invitados
-                  </td>
-                </tr>
-              ) : (
-                filtered.map(inv => {
+              {filtered.map(inv => {
                   const total = inv.persons.length
                   const matchCount = personStatus === null
                     ? inv.persons.filter(p => p.status === 'CONFIRMED').length
@@ -126,15 +124,15 @@ export default function GuestsListClient({ invitations }: { invitations: Invitat
                   return (
                     <tr key={inv.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4">
-                        <p className="font-medium text-sm" style={{ color: 'var(--brown-dark)' }}>{inv.titularName}</p>
+                        <p className="font-medium text-sm whitespace-nowrap" style={{ color: 'var(--brown-dark)' }}>{inv.titularName}</p>
                       </td>
-                      <td className="px-6 py-4 text-sm" style={{ color: 'var(--brown-mid)' }}>{total}</td>
-                      <td className="px-6 py-4 text-sm font-medium" style={{ color: 'var(--brown-dark)' }}>
+                      <td className="px-6 py-4 text-sm whitespace-nowrap" style={{ color: 'var(--brown-mid)' }}>{total}</td>
+                      <td className="px-6 py-4 text-sm font-medium whitespace-nowrap" style={{ color: 'var(--brown-dark)' }}>
                         {matchCount}/{total}
                       </td>
                       <td className="px-6 py-4">
                         <span
-                          className="text-xs px-2 py-0.5 rounded-full"
+                          className="text-xs px-2 py-0.5 rounded-full whitespace-nowrap"
                           style={{
                             background: inv.invitedBy === 'NOE' ? '#eff6ff' : '#fdf4ff',
                             color: inv.invitedBy === 'NOE' ? '#1d4ed8' : '#7e22ce',
@@ -147,7 +145,7 @@ export default function GuestsListClient({ invitations }: { invitations: Invitat
                         <StatusBadge status={personStatus === null ? inv.status : filterStatus} />
                       </td>
                       <td className="px-6 py-4">
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 whitespace-nowrap">
                           <Link
                             href={editHref}
                             className="text-xs px-3 py-1.5 rounded-lg transition-all hover:opacity-80"
@@ -167,11 +165,11 @@ export default function GuestsListClient({ invitations }: { invitations: Invitat
                       </td>
                     </tr>
                   )
-                })
-              )}
+              })}
             </tbody>
           </table>
         </div>
+        )}
       </div>
     </div>
   )

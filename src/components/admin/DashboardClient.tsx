@@ -84,7 +84,7 @@ export default function DashboardClient({
             }}
           />
         </div>
-        <div className="flex gap-6 mt-3 text-xs" style={{ color: 'var(--brown-mid)' }}>
+        <div className="flex flex-wrap gap-x-6 gap-y-1 mt-3 text-xs" style={{ color: 'var(--brown-mid)' }}>
           <span>✓ Confirmados: <strong>{stats.confirmedSlots}</strong></span>
           <span>⏳ Pendientes: <strong>{stats.pendingSlots}</strong></span>
           <span>○ Disponibles: <strong>{stats.available}</strong></span>
@@ -126,7 +126,7 @@ export default function DashboardClient({
 
       {/* List */}
       <div className="bg-white rounded-2xl shadow-sm overflow-hidden" style={{ border: '1px solid var(--border)' }}>
-        <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: 'var(--border)' }}>
+        <div className="flex flex-wrap items-center justify-between gap-3 px-4 sm:px-6 py-4 border-b" style={{ borderColor: 'var(--border)' }}>
           <h2 className="font-semibold" style={{ color: 'var(--brown-dark)' }}>
             {filter === 'ALL' ? 'Todos los invitados' : filter === 'ACCEPTED' ? 'Aceptaron' : filter === 'PENDING' ? 'Pendientes' : 'Rechazaron'}
             <span className="ml-2 text-sm font-normal" style={{ color: 'var(--gold-dark)' }}>({filtered.length})</span>
@@ -163,22 +163,22 @@ export default function DashboardClient({
                 ? `/admin/guests/${inv.id}`
                 : `/admin/guests/${inv.id}?status=${personStatus}`
               return (
-                <div key={inv.id} className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors">
-                  <div className="flex items-center gap-4">
+                <div key={inv.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 sm:px-6 py-4 hover:bg-gray-50 transition-colors">
+                  <div className="flex items-center gap-4 min-w-0">
                     <div
                       className="w-10 h-10 rounded-full flex items-center justify-center font-serif text-lg shrink-0"
                       style={{ background: 'var(--cream-dark)', color: 'var(--gold-dark)' }}
                     >
                       {inv.titularName.charAt(0)}
                     </div>
-                    <div>
-                      <p className="font-medium" style={{ color: 'var(--brown-dark)' }}>{inv.titularName}</p>
-                      <div className="flex items-center gap-3 mt-0.5">
-                        <span className="text-xs" style={{ color: 'var(--brown-mid)' }}>
+                    <div className="min-w-0">
+                      <p className="font-medium truncate" style={{ color: 'var(--brown-dark)' }}>{inv.titularName}</p>
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-0.5">
+                        <span className="text-xs whitespace-nowrap" style={{ color: 'var(--brown-mid)' }}>
                           {matchCount}/{total} {label}
                         </span>
                         <span
-                          className="text-xs px-2 py-0.5 rounded-full"
+                          className="text-xs px-2 py-0.5 rounded-full whitespace-nowrap"
                           style={{
                             background: inv.invitedBy === 'NOE' ? '#eff6ff' : '#fdf4ff',
                             color: inv.invitedBy === 'NOE' ? '#1d4ed8' : '#7e22ce',
@@ -189,11 +189,11 @@ export default function DashboardClient({
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 pl-14 sm:pl-0">
                     <StatusBadge status={filter === 'ALL' ? inv.status : filter} />
                     <Link
                       href={detailsHref}
-                      className="text-xs px-3 py-1.5 rounded-lg transition-all hover:opacity-80"
+                      className="text-xs px-3 py-1.5 rounded-lg transition-all hover:opacity-80 whitespace-nowrap"
                       style={{ background: 'var(--cream-dark)', color: 'var(--brown-mid)' }}
                     >
                       Detalles
@@ -201,7 +201,7 @@ export default function DashboardClient({
                     <Link
                       href={`/invite/${inv.id}`}
                       target="_blank"
-                      className="text-xs px-3 py-1.5 rounded-lg transition-all hover:opacity-80"
+                      className="text-xs px-3 py-1.5 rounded-lg transition-all hover:opacity-80 whitespace-nowrap"
                       style={{ background: 'var(--gold-light)', color: 'var(--brown-dark)' }}
                     >
                       Ver invitación ↗

@@ -115,8 +115,8 @@ export default function GuestDetailClient({
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       {/* Header */}
-      <div className="flex items-start justify-between">
-        <div>
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+        <div className="min-w-0">
           <button
             onClick={() => router.back()}
             className="text-sm hover:opacity-70 transition-opacity"
@@ -124,7 +124,7 @@ export default function GuestDetailClient({
           >
             ← Volver
           </button>
-          <h1 className="font-serif text-3xl mt-2" style={{ color: 'var(--brown-dark)' }}>
+          <h1 className="font-serif text-3xl mt-2 break-words" style={{ color: 'var(--brown-dark)' }}>
             {invitation.titularName}
           </h1>
           <p className="text-sm mt-1" style={{ color: 'var(--brown-mid)' }}>
@@ -137,7 +137,7 @@ export default function GuestDetailClient({
           <Link
             href={`/invite/${invitation.id}`}
             target="_blank"
-            className="px-4 py-2 rounded-lg text-sm font-medium hover:opacity-80 transition-all"
+            className="px-4 py-2 rounded-lg text-sm font-medium hover:opacity-80 transition-all whitespace-nowrap"
             style={{ background: 'var(--gold-light)', color: 'var(--brown-dark)' }}
           >
             Ver invitación ↗
@@ -245,14 +245,14 @@ export default function GuestDetailClient({
           {displayedPersons.map(p => (
             <div
               key={p.id}
-              className="flex items-center justify-between p-4 rounded-xl"
+              className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-xl"
               style={{ background: 'var(--cream)', border: '1px solid var(--gold-light)' }}
             >
-              <div>
-                <p className="font-medium text-sm" style={{ color: 'var(--brown-dark)' }}>
+              <div className="min-w-0">
+                <p className="font-medium text-sm break-words" style={{ color: 'var(--brown-dark)' }}>
                   {p.name}
                   {p.isChild && (
-                    <span className="ml-2 text-xs px-2 py-0.5 rounded-full" style={{ background: '#fef3c7', color: '#92400e' }}>
+                    <span className="ml-2 text-xs px-2 py-0.5 rounded-full whitespace-nowrap" style={{ background: '#fef3c7', color: '#92400e' }}>
                       Menor
                     </span>
                   )}
@@ -266,7 +266,7 @@ export default function GuestDetailClient({
               <select
                 value={p.status}
                 onChange={e => updatePersonStatus(p.id, e.target.value)}
-                className="px-3 py-1.5 rounded-lg text-xs outline-none"
+                className="px-3 py-1.5 rounded-lg text-xs outline-none shrink-0"
                 style={{ background: 'white', border: '1px solid var(--gold-light)', color: 'var(--brown-dark)' }}
               >
                 <option value="PENDING">Pendiente</option>

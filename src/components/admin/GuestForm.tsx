@@ -117,7 +117,7 @@ export default function GuestForm({ availableSlots, initialData }: GuestFormProp
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--brown-mid)' }}>
               Invitado por *
@@ -165,12 +165,12 @@ export default function GuestForm({ availableSlots, initialData }: GuestFormProp
 
       {/* Persons */}
       <div className="bg-white rounded-2xl p-6 space-y-4" style={{ border: '1px solid var(--border)' }}>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="font-semibold" style={{ color: 'var(--brown-dark)' }}>
             Personas invitadas
           </h2>
           <div className="flex items-center gap-3">
-            <span className="text-xs" style={{ color: slotsOk ? 'var(--gold-dark)' : '#dc2626' }}>
+            <span className="text-xs whitespace-nowrap" style={{ color: slotsOk ? 'var(--gold-dark)' : '#dc2626' }}>
               {slotsNeeded} / {availableSlots} lugares
             </span>
           </div>
@@ -184,35 +184,37 @@ export default function GuestForm({ availableSlots, initialData }: GuestFormProp
 
         <div className="space-y-3">
           {persons.map((p, i) => (
-            <div key={i} className="flex gap-3 items-center">
+            <div key={i} className="flex flex-wrap gap-3 items-center">
               <input
                 type="text"
                 value={p.name}
                 onChange={e => updatePerson(i, 'name', e.target.value)}
                 placeholder={`Nombre ${i + 1}`}
-                className="flex-1 px-4 py-2.5 rounded-lg text-sm outline-none"
+                className="flex-1 min-w-[160px] px-4 py-2.5 rounded-lg text-sm outline-none"
                 style={{ background: 'var(--cream)', border: '1px solid var(--gold-light)', color: 'var(--brown-dark)' }}
               />
-              <label className="flex items-center gap-2 text-sm cursor-pointer whitespace-nowrap" style={{ color: 'var(--brown-mid)' }}>
-                <input
-                  type="checkbox"
-                  checked={p.isChild}
-                  onChange={e => updatePerson(i, 'isChild', e.target.checked)}
-                  className="w-4 h-4 rounded"
-                  style={{ accentColor: 'var(--gold)' }}
-                />
-                Menor 8 años
-              </label>
-              {persons.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => removePerson(i)}
-                  className="w-8 h-8 rounded-lg flex items-center justify-center text-sm hover:opacity-80 transition-opacity"
-                  style={{ background: '#fef2f2', color: '#dc2626' }}
-                >
-                  ✕
-                </button>
-              )}
+              <div className="flex items-center gap-3 shrink-0">
+                <label className="flex items-center gap-2 text-sm cursor-pointer whitespace-nowrap" style={{ color: 'var(--brown-mid)' }}>
+                  <input
+                    type="checkbox"
+                    checked={p.isChild}
+                    onChange={e => updatePerson(i, 'isChild', e.target.checked)}
+                    className="w-4 h-4 rounded"
+                    style={{ accentColor: 'var(--gold)' }}
+                  />
+                  Menor 8 años
+                </label>
+                {persons.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removePerson(i)}
+                    className="w-8 h-8 rounded-lg flex items-center justify-center text-sm hover:opacity-80 transition-opacity shrink-0"
+                    style={{ background: '#fef2f2', color: '#dc2626' }}
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
             </div>
           ))}
         </div>

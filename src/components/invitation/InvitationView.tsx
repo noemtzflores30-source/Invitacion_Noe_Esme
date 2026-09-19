@@ -94,6 +94,7 @@ export default function InvitationView({
   const deadlinePassed = isDeadlinePassed(config?.deadline)
   const isPersonalized = !!invitation
   const isResponded = invitation?.status === 'ACCEPTED' || invitation?.status === 'REJECTED'
+  const hasChild = !!invitation?.persons.some(p => p.isChild)
 
   return (
     <div className="min-h-screen invitation-bg">
@@ -197,7 +198,7 @@ export default function InvitationView({
         </section>
       )}
 
-      {config?.noticeText && (
+      {isPersonalized && hasChild && config?.noticeText && (
         <section style={{ maxWidth: 680, margin: '0 auto', padding: 'clamp(64px,12vw,96px) clamp(20px,5vw,28px)' }}>
           <div style={{ border: `1px solid ${c.border}`, borderTop: `3px solid ${c.gold}`, background: '#fffdfb', padding: 'clamp(28px,5vw,46px)', textAlign: 'center' }}>
             <div className="font-label" style={{ fontSize: 14, color: c.gold }}>Aviso importante</div>
@@ -280,20 +281,33 @@ function Portada({ eventDate, config }: { eventDate: string; config: Config | nu
 }
 
 function Countdown({ eventDate, ceremonyTime }: { eventDate: string; ceremonyTime: string }) {
-  // now stays null through SSR and the first client render so the markup
-  // matches exactly; the live value only appears after mount, avoiding a
-  // hydration mismatch from Date.now() differing between server and client.
-  const [now, setNow] = useState<number | null>(null)
+  // Computed eagerly (not deferred to an effect) so the real countdown shows
+  // immediately with no "--" placeholder flash. Server and client render at
+  // slightly different instants, so the digits can differ by a second —
+  // each value carries suppressHydrationWarning to silence that harmless
+  // mismatch instead of hiding real numbers behind a loading state.
+  const [now, setNow] = useState(() => Date.now())
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional post-hydration tick, see comment above
-    setNow(Date.now())
-    const t = setInterval(() => setNow(Date.now()), 1000)
-    return () => clearInterval(t)
+    // Browsers throttle setInterval in a backgrounded/inactive tab (down to
+    // ~once/minute after a few minutes hidden) — that's what made this look
+    // "stuck" on a phone with the screen locked or the tab switched away.
+    // The 1s interval keeps ticking normally while visible; resyncing to the
+    // real clock on visibilitychange/focus snaps it back instantly instead
+    // of waiting out the throttled delay once the user looks again.
+    const tick = () => setNow(Date.now())
+    const t = setInterval(tick, 1000)
+    document.addEventListener('visibilitychange', tick)
+    window.addEventListener('focus', tick)
+    return () => {
+      clearInterval(t)
+      document.removeEventListener('visibilitychange', tick)
+      window.removeEventListener('focus', tick)
+    }
   }, [])
 
   const target = new Date(`${eventDate}T${ceremonyTime}:00`).getTime()
-  const diff = now !== null ? Math.max(0, target - now) : 0
+  const diff = Math.max(0, target - now)
   const sec = Math.floor(diff / 1000)
   const days = Math.floor(sec / 86400)
   const hours = Math.floor((sec % 86400) / 3600)
@@ -302,10 +316,10 @@ function Countdown({ eventDate, ceremonyTime }: { eventDate: string; ceremonyTim
   const pad = (n: number) => String(n).padStart(2, '0')
 
   const cells = [
-    { label: 'Días', value: now === null ? '--' : String(days) },
-    { label: 'Horas', value: now === null ? '--' : pad(hours) },
-    { label: 'Minutos', value: now === null ? '--' : pad(mins) },
-    { label: 'Segundos', value: now === null ? '--' : pad(secs) },
+    { label: 'Días', value: String(days) },
+    { label: 'Horas', value: pad(hours) },
+    { label: 'Minutos', value: pad(mins) },
+    { label: 'Segundos', value: pad(secs) },
   ]
 
   return (
@@ -317,7 +331,7 @@ function Countdown({ eventDate, ceremonyTime }: { eventDate: string; ceremonyTim
       <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 'clamp(12px,3vw,26px)' }}>
         {cells.map(u => (
           <div key={u.label} style={{ flex: '1 1 0', minWidth: 120, maxWidth: 160, background: '#fff', color: c.accent, padding: '30px 14px', textAlign: 'center', border: `1px solid ${c.borderSoft}`, boxShadow: '0 10px 28px rgba(150,120,80,0.08)' }}>
-            <div style={{ fontFamily: TIMES, fontWeight: 300, fontSize: 'clamp(40px,8vw,64px)', lineHeight: 1 }}>{u.value}</div>
+            <div suppressHydrationWarning style={{ fontFamily: TIMES, fontWeight: 300, fontSize: 'clamp(40px,8vw,64px)', lineHeight: 1 }}>{u.value}</div>
             <div className="font-label" style={{ fontFamily: TIMES, fontSize: 11, color: c.goldLabel, marginTop: 14 }}>{u.label}</div>
           </div>
         ))}

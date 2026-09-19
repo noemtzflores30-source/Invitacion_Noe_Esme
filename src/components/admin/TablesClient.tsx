@@ -120,12 +120,12 @@ export default function TablesClient({
         {searchResult.length > 0 && (
           <div className="space-y-2">
             {searchResult.map(p => (
-              <div key={p.id} className="flex items-center justify-between p-3 rounded-lg" style={{ background: 'var(--cream)' }}>
-                <div>
+              <div key={p.id} className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-lg" style={{ background: 'var(--cream)' }}>
+                <div className="min-w-0 break-words">
                   <span className="text-sm font-medium" style={{ color: 'var(--brown-dark)' }}>{p.name}</span>
                   <span className="text-xs ml-2" style={{ color: 'var(--brown-mid)' }}>({p.invitation.titularName})</span>
                 </div>
-                <span className="text-sm" style={{ color: 'var(--gold-dark)' }}>
+                <span className="text-sm whitespace-nowrap" style={{ color: 'var(--gold-dark)' }}>
                   {p.tableAssignment ? `Mesa ${p.tableAssignment.table.tableNumber}` : 'Sin mesa'}
                 </span>
               </div>
@@ -137,7 +137,7 @@ export default function TablesClient({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Tables grid */}
         <div className="lg:col-span-2 space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="font-semibold" style={{ color: 'var(--brown-dark)' }}>Mesas</h2>
             <select
               value={filterTableBy}
@@ -208,8 +208,8 @@ export default function TablesClient({
                 ) : (
                   <div className="space-y-2">
                     {selectedTable.assignments.map(a => (
-                      <div key={a.id} className="flex items-center justify-between p-2.5 rounded-lg" style={{ background: 'var(--cream)' }}>
-                        <div>
+                      <div key={a.id} className="flex items-center justify-between gap-2 p-2.5 rounded-lg" style={{ background: 'var(--cream)' }}>
+                        <div className="min-w-0 break-words">
                           <p className="text-sm font-medium" style={{ color: 'var(--brown-dark)' }}>{a.person.name}</p>
                           <p className="text-xs" style={{ color: 'var(--brown-mid)' }}>
                             {a.invitation.titularName} · {a.invitation.invitedBy === 'NOE' ? 'Noe' : 'Esme'}
@@ -217,7 +217,7 @@ export default function TablesClient({
                         </div>
                         <button
                           onClick={() => removeAssignment(a.personId, a.tableId)}
-                          className="text-xs px-2 py-1 rounded hover:opacity-70 transition-opacity"
+                          className="text-xs px-2 py-1 rounded hover:opacity-70 transition-opacity shrink-0"
                           style={{ color: '#dc2626' }}
                         >
                           ✕

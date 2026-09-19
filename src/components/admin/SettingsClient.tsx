@@ -181,7 +181,7 @@ export default function SettingsClient({ initialConfig }: { initialConfig: Confi
         </div>
         <div>
           <label className="block text-sm font-medium mb-1.5" style={labelStyle}>Coordenadas del lugar (para el pin del mapa)</label>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <input type="text" value={config.venueLat} onChange={e => updateField('venueLat', e.target.value)} className={inputClass} style={inputStyle} placeholder="Latitud, ej. 18.8994602" />
             <input type="text" value={config.venueLng} onChange={e => updateField('venueLng', e.target.value)} className={inputClass} style={inputStyle} placeholder="Longitud, ej. -99.2137462" />
           </div>
@@ -204,7 +204,7 @@ export default function SettingsClient({ initialConfig }: { initialConfig: Confi
         </div>
         <div>
           <label className="block text-sm font-medium mb-1.5" style={labelStyle}>Logo / sello (opcional)</label>
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex flex-wrap items-center gap-3 mb-2">
             <ImageUploader
               label="Subir sello"
               transform="f_auto,q_auto,w_600,c_limit"
@@ -282,14 +282,23 @@ export default function SettingsClient({ initialConfig }: { initialConfig: Confi
           <p className="text-sm text-center py-4" style={{ color: 'var(--brown-mid)' }}>Sin itinerario</p>
         )}
         {config.itinerary.map((item, i) => (
-          <div key={i} className="flex gap-3 items-center">
-            <input
-              type="time"
-              value={item.time}
-              onChange={e => updateItinerary(i, 'time', e.target.value)}
-              className="w-28 px-3 py-2 rounded-lg text-sm outline-none shrink-0"
-              style={inputStyle}
-            />
+          <div key={i} className="flex flex-col sm:flex-row gap-2 sm:gap-3 sm:items-center p-3 sm:p-0 rounded-lg sm:rounded-none" style={{ background: 'var(--cream)' }}>
+            <div className="flex gap-2 sm:contents">
+              <input
+                type="time"
+                value={item.time}
+                onChange={e => updateItinerary(i, 'time', e.target.value)}
+                className="w-28 px-3 py-2 rounded-lg text-sm outline-none shrink-0"
+                style={inputStyle}
+              />
+              <button
+                onClick={() => removeItineraryItem(i)}
+                className="sm:hidden ml-auto w-9 h-9 shrink-0 flex items-center justify-center rounded-lg text-sm hover:opacity-70 transition-opacity"
+                style={{ color: '#dc2626' }}
+              >
+                ✕
+              </button>
+            </div>
             <input
               type="text"
               value={item.event}
@@ -306,7 +315,7 @@ export default function SettingsClient({ initialConfig }: { initialConfig: Confi
               className="flex-1 px-4 py-2 rounded-lg text-sm outline-none"
               style={inputStyle}
             />
-            <button onClick={() => removeItineraryItem(i)} className="text-sm hover:opacity-70 transition-opacity" style={{ color: '#dc2626' }}>✕</button>
+            <button onClick={() => removeItineraryItem(i)} className="hidden sm:block text-sm hover:opacity-70 transition-opacity shrink-0" style={{ color: '#dc2626' }}>✕</button>
           </div>
         ))}
       </section>
@@ -331,21 +340,21 @@ export default function SettingsClient({ initialConfig }: { initialConfig: Confi
               onUploaded={url => setConfig(prev => ({ ...prev, galleryImages: [...prev.galleryImages, url] }))}
             />
           </div>
-          <div className="flex gap-2 mb-3">
+          <div className="flex flex-wrap gap-2 mb-3">
             <input
               type="url"
               value={newGalleryUrl}
               onChange={e => setNewGalleryUrl(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && addGalleryImage()}
               placeholder="o pega una URL directamente..."
-              className="flex-1 px-4 py-2 rounded-lg text-sm outline-none"
+              className="flex-1 min-w-[160px] px-4 py-2 rounded-lg text-sm outline-none"
               style={inputStyle}
             />
-            <button onClick={addGalleryImage} className="px-4 py-2 rounded-lg text-sm font-medium text-white hover:opacity-90 transition-all" style={{ background: 'var(--gold-dark)' }}>
+            <button onClick={addGalleryImage} className="px-4 py-2 rounded-lg text-sm font-medium text-white hover:opacity-90 transition-all shrink-0" style={{ background: 'var(--gold-dark)' }}>
               Agregar
             </button>
           </div>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {config.galleryImages.map((url, i) => (
               <div key={i} className="relative group">
                 <img src={url} alt="" className="w-full h-20 object-cover rounded-lg" onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
@@ -381,7 +390,7 @@ export default function SettingsClient({ initialConfig }: { initialConfig: Confi
           )}
           <div className="space-y-2">
             {config.prohibitedColors.map((c, i) => (
-              <div key={i} className="flex gap-3 items-center">
+              <div key={i} className="flex flex-wrap gap-3 items-center">
                 <input
                   type="color"
                   value={c.hex}
@@ -393,7 +402,7 @@ export default function SettingsClient({ initialConfig }: { initialConfig: Confi
                   type="text"
                   value={c.hex}
                   onChange={e => updateProhibitedColor(i, 'hex', e.target.value)}
-                  className="w-28 px-3 py-2 rounded-lg text-sm outline-none shrink-0"
+                  className="w-24 px-3 py-2 rounded-lg text-sm outline-none shrink-0"
                   style={inputStyle}
                 />
                 <input
@@ -401,10 +410,10 @@ export default function SettingsClient({ initialConfig }: { initialConfig: Confi
                   value={c.name}
                   onChange={e => updateProhibitedColor(i, 'name', e.target.value)}
                   placeholder="Nombre del color"
-                  className="flex-1 px-4 py-2 rounded-lg text-sm outline-none"
+                  className="flex-1 min-w-[120px] px-4 py-2 rounded-lg text-sm outline-none"
                   style={inputStyle}
                 />
-                <button onClick={() => removeProhibitedColor(i)} className="text-sm hover:opacity-70 transition-opacity" style={{ color: '#dc2626' }}>✕</button>
+                <button onClick={() => removeProhibitedColor(i)} className="text-sm hover:opacity-70 transition-opacity shrink-0" style={{ color: '#dc2626' }}>✕</button>
               </div>
             ))}
           </div>
