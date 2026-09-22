@@ -33,6 +33,7 @@ export default async function GenericInvitePage() {
     giftMessage: config.giftMessage,
     noticeTitle: config.noticeTitle,
     noticeText: config.noticeText,
+    deadlineInvalidationMessage: config.deadlineInvalidationMessage,
   } : null
 
   return (

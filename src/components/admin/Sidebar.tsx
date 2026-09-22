@@ -53,7 +53,7 @@ export default function AdminSidebar({
         {!effectiveCollapsed && (
           <div>
             <p className="font-serif text-sm leading-tight" style={{ color: 'var(--gold-light)' }}>
-              Noe &amp; Esme
+              Esmeralda &amp; Noe
             </p>
             <p className="text-xs" style={{ color: 'rgba(232,213,176,0.5)' }}>Boda 2027</p>
           </div>

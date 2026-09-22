@@ -54,6 +54,7 @@ async function main() {
       giftMessage: 'Si deseas contribuir de alguna manera, estamos ahorrando para algo especial. Si gustas, tu aporte en efectivo sería genial. No te preocupes, el sobre estará en la mesa.',
       noticeTitle: 'Cuidado del recinto',
       noticeText: 'Con el fin de preservar este hermoso espacio donde compartiremos un día tan especial, agradecemos a los padres y tutores su apoyo supervisando a los menores en todo momento. Les recordamos que cualquier daño ocasionado a las instalaciones, mobiliario u objetos del recinto deberá ser cubierto por la persona responsable.',
+      deadlineInvalidationMessage: 'Si no recibimos su confirmación dentro de la fecha establecida, su invitación quedará invalidada y sus lugares serán reasignados a otras personas.',
     },
   })
 

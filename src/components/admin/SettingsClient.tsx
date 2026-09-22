@@ -41,6 +41,7 @@ interface Config {
   giftMessage: string
   noticeTitle: string
   noticeText: string
+  deadlineInvalidationMessage: string
 }
 
 export default function SettingsClient({ initialConfig }: { initialConfig: Config | null }) {
@@ -71,6 +72,7 @@ export default function SettingsClient({ initialConfig }: { initialConfig: Confi
     giftMessage: '',
     noticeTitle: '',
     noticeText: '',
+    deadlineInvalidationMessage: '',
   })
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -267,6 +269,20 @@ export default function SettingsClient({ initialConfig }: { initialConfig: Confi
             />
             <p className="text-xs mt-1" style={{ color: 'var(--brown-mid)', opacity: 0.7 }}>Para segunda ronda o fecha más cercana</p>
           </div>
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-1.5" style={labelStyle}>Mensaje de invalidación por falta de respuesta</label>
+          <textarea
+            value={config.deadlineInvalidationMessage}
+            onChange={e => updateField('deadlineInvalidationMessage', e.target.value)}
+            rows={3}
+            className={inputClass + ' resize-none'}
+            style={inputStyle}
+            placeholder="Si no recibimos su confirmación antes de esta fecha..."
+          />
+          <p className="text-xs mt-1.5" style={{ color: 'var(--brown-mid)', opacity: 0.7 }}>
+            Se muestra en la invitación junto a la fecha límite, para dejar claro que no responder a tiempo invalida el lugar reservado.
+          </p>
         </div>
       </section>
 

@@ -1,7 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { formatDate } from '@/lib/utils'
+import { formatShortDate, sortAdultsFirst } from '@/lib/utils'
+
+const TIMES = "'Times New Roman', Times, serif"
 
 interface Person {
   id: string
@@ -32,7 +34,15 @@ const c = {
   footerText: '#f8efe7',
 }
 
-export default function RSVPSection({ invitation, deadline }: { invitation: InvitationData; deadline: string | null }) {
+export default function RSVPSection({
+  invitation,
+  deadline,
+  deadlineInvalidationMessage,
+}: {
+  invitation: InvitationData
+  deadline: string | null
+  deadlineInvalidationMessage?: string
+}) {
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [allChecked, setAllChecked] = useState(false)
   const [message, setMessage] = useState('')
@@ -40,7 +50,8 @@ export default function RSVPSection({ invitation, deadline }: { invitation: Invi
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const multiPerson = invitation.persons.length > 1
+  const persons = sortAdultsFirst(invitation.persons)
+  const multiPerson = persons.length > 1
 
   function togglePerson(id: string) {
     setAllChecked(false)
@@ -55,7 +66,7 @@ export default function RSVPSection({ invitation, deadline }: { invitation: Invi
   function toggleAll() {
     const next = !allChecked
     setAllChecked(next)
-    setSelected(next ? new Set(invitation.persons.map(p => p.id)) : new Set())
+    setSelected(next ? new Set(persons.map(p => p.id)) : new Set())
   }
 
   async function handleSubmit() {
@@ -95,19 +106,45 @@ export default function RSVPSection({ invitation, deadline }: { invitation: Invi
   }
 
   return (
-    <section style={{ background: c.bgAlt, padding: 'clamp(64px,12vw,100px) clamp(20px,5vw,28px)' }}>
-      <div style={{ maxWidth: 600, margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: 46 }}>
-          <div className="font-label" style={{ fontSize: 12, color: c.goldLabel }}>Confirme su asistencia</div>
-          <h2 style={{ margin: '12px 0 0', fontWeight: 400, fontSize: 'clamp(32px,6vw,50px)', color: c.heading }}>R.S.V.P.</h2>
+    <section style={{ background: c.bgAlt, padding: 'clamp(70px,13vw,110px) clamp(20px,5vw,28px)' }}>
+      <div style={{ maxWidth: 620, margin: '0 auto' }}>
+        {/* Predominant heading — this is the single most important action in
+            the whole invitation, so it gets the strongest visual treatment
+            in the page: the biggest heading size, immediately followed by
+            the deadline reminder (moved here from its own section) so the
+            "when" sits right next to the "what" instead of being repeated
+            further down the page. */}
+        <div style={{ textAlign: 'center', marginBottom: 40 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 18 }}>
+            <span style={{ width: 30, height: 1, background: c.gold }} />
+            <span style={{ width: 7, height: 7, background: c.gold, transform: 'rotate(45deg)' }} />
+            <span style={{ width: 30, height: 1, background: c.gold }} />
+          </div>
+          <h2 style={{ margin: 0, fontWeight: 600, fontSize: 'clamp(38px,7.5vw,62px)', color: c.accent, letterSpacing: '0.01em' }}>
+            Confirmar asistencia
+          </h2>
+
           {deadline && (
-            <p className="font-label" style={{ fontSize: 13, color: c.mutedFaint, margin: '16px 0 0', letterSpacing: '0.04em', textTransform: 'none' }}>
-              Le agradecemos confirmar antes del <span style={{ fontFamily: "'Times New Roman', Times, serif" }}>{formatDate(deadline)}</span>.
-            </p>
+            <div style={{ marginTop: 30, textAlign: 'center' }}>
+              <div className="font-label" style={{ fontSize: 13, color: c.goldLabel, fontWeight: 700 }}>
+                Confirmar asistencia antes de la siguiente fecha
+              </div>
+              <p style={{ fontFamily: TIMES, fontSize: 'clamp(30px,5.5vw,42px)', fontStyle: 'italic', color: c.accent, margin: '14px 0 0' }}>
+                {formatShortDate(deadline)}
+              </p>
+              <p style={{ fontSize: 18, lineHeight: 1.6, color: c.mutedFaint, margin: '16px 0 0' }}>
+                Le solicitamos amablemente confirmar su asistencia antes de la fecha indicada.
+              </p>
+              {deadlineInvalidationMessage && (
+                <p style={{ fontSize: 17, fontWeight: 700, lineHeight: 1.6, color: c.accent, margin: '18px auto 0', maxWidth: 480 }}>
+                  ⚠ {deadlineInvalidationMessage}
+                </p>
+              )}
+            </div>
           )}
         </div>
 
-        <div style={{ background: '#fffdfb', border: `1px solid ${c.border}`, padding: 'clamp(26px,5vw,44px)' }}>
+        <div style={{ background: '#fffdfb', border: `1px solid ${c.gold}`, borderTop: `5px solid ${c.accent}`, padding: 'clamp(26px,5vw,44px)', boxShadow: '0 18px 40px rgba(125,90,79,0.1)' }}>
           <div className="font-label" style={{ fontSize: 20, color: c.mutedFaint, marginBottom: 6, fontWeight: 600 }}>
             {multiPerson ? '¿Quién nos acompañará?' : `¿${invitation.titularName} asistirá?`}
           </div>
@@ -127,24 +164,44 @@ export default function RSVPSection({ invitation, deadline }: { invitation: Invi
           )}
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2, marginBottom: 14 }}>
-            {invitation.persons.map(p => {
+            {persons.map(p => {
               const isSelected = selected.has(p.id)
               return (
                 <button
                   key={p.id}
                   onClick={() => togglePerson(p.id)}
-                  style={{ display: 'flex', alignItems: 'center', gap: 16, width: '100%', textAlign: 'left', background: 'transparent', border: 'none', borderBottom: `1px solid ${c.borderSoft}`, padding: '14px 4px', cursor: 'pointer' }}
+                  aria-pressed={isSelected}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 16,
+                    width: '100%',
+                    textAlign: 'left',
+                    background: isSelected ? 'rgba(125,90,79,0.05)' : 'transparent',
+                    border: 'none',
+                    borderBottom: `1px solid ${c.borderSoft}`,
+                    padding: '16px 12px',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s ease',
+                  }}
                 >
                   {isSelected ? (
-                    <span style={{ flex: '0 0 24px', width: 24, height: 24, border: `1px solid ${c.accent}`, background: c.accent, color: c.footerText, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>✓</span>
+                    <span style={{ flex: '0 0 26px', width: 26, height: 26, borderRadius: '50%', border: `1px solid ${c.accent}`, background: c.accent, color: c.footerText, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>✓</span>
                   ) : (
-                    <span style={{ flex: '0 0 24px', width: 24, height: 24, border: '1px solid #d4c0b0', background: '#fff' }} />
+                    <span style={{ flex: '0 0 26px', width: 26, height: 26, borderRadius: '50%', border: '1px solid #d4c0b0', background: '#fff' }} />
                   )}
-                  <span style={{ flex: 1, fontSize: 22, color: c.text }}>{p.name}</span>
-                  {p.isChild && (
-                    <span className="font-label" style={{ fontSize: 10, color: c.mutedSoft }}>Menor de 8</span>
-                  )}
-                  <span className="font-label" style={{ fontSize: 11, color: c.mutedSoft }}>{isSelected ? 'Asistirá' : 'No asistirá'}</span>
+                  <span
+                    style={{
+                      flex: 1,
+                      fontSize: 23,
+                      color: c.text,
+                      opacity: isSelected ? 1 : 0.4,
+                      filter: isSelected ? 'none' : 'grayscale(0.5)',
+                      transition: 'opacity 0.2s ease, filter 0.2s ease',
+                    }}
+                  >
+                    {p.name}
+                  </span>
                 </button>
               )
             })}
@@ -173,7 +230,7 @@ export default function RSVPSection({ invitation, deadline }: { invitation: Invi
             onClick={handleSubmit}
             disabled={loading}
             className="font-label"
-            style={{ width: '100%', background: c.accent, color: c.footerText, border: 'none', fontSize: 13, padding: 20, cursor: loading ? 'default' : 'pointer', opacity: loading ? 0.7 : 1 }}
+            style={{ width: '100%', background: c.accent, color: c.footerText, border: 'none', fontSize: 15, fontWeight: 700, padding: 22, cursor: loading ? 'default' : 'pointer', opacity: loading ? 0.7 : 1, letterSpacing: '0.18em' }}
             onMouseEnter={e => { if (!loading) e.currentTarget.style.background = c.accentHover }}
             onMouseLeave={e => { e.currentTarget.style.background = c.accent }}
           >

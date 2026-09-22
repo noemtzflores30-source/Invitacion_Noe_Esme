@@ -51,6 +51,7 @@ export default async function PersonalizedInvitePage({
     giftMessage: config.giftMessage,
     noticeTitle: config.noticeTitle,
     noticeText: config.noticeText,
+    deadlineInvalidationMessage: config.deadlineInvalidationMessage,
   } : null
 
   return (

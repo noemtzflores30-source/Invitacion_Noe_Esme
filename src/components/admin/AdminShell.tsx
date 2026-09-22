@@ -47,7 +47,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         >
           N
         </div>
-        <span className="font-serif text-base truncate" style={{ color: 'var(--gold-light)' }}>Noe &amp; Esme</span>
+        <span className="font-serif text-base truncate" style={{ color: 'var(--gold-light)' }}>Esmeralda &amp; Noe</span>
       </header>
 
       {/* Mobile drawer + backdrop */}

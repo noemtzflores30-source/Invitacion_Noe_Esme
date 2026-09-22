@@ -44,3 +44,10 @@ export function isDeadlinePassed(deadlineStr: string | null | undefined): boolea
 export function cn(...classes: (string | undefined | false | null)[]): string {
   return classes.filter(Boolean).join(' ')
 }
+
+// Adults first, children last — stable within each group so the original
+// entry order (as typed by the admin) is preserved among peers. Used across
+// the guest-facing invitation wherever a person list is displayed.
+export function sortAdultsFirst<T extends { isChild: boolean }>(persons: T[]): T[] {
+  return [...persons].sort((a, b) => Number(a.isChild) - Number(b.isChild))
+}

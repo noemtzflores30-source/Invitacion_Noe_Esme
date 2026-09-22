@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { formatShortDate, isDeadlinePassed } from '@/lib/utils'
+import { formatShortDate, isDeadlinePassed, sortAdultsFirst } from '@/lib/utils'
 import RSVPSection from './RSVPSection'
 
 interface Person {
@@ -55,6 +55,7 @@ interface Config {
   giftMessage: string
   noticeTitle: string
   noticeText: string
+  deadlineInvalidationMessage: string
 }
 
 // Dedicated typeface for standalone date displays and the countdown —
@@ -117,33 +118,26 @@ export default function InvitationView({
         <Invitados invitation={invitation} />
       )}
 
-      {isPersonalized && config?.deadline && (
-        <section style={{ maxWidth: 620, margin: '0 auto', padding: 'clamp(64px,12vw,100px) clamp(20px,5vw,28px) clamp(48px,10vw,72px)' }}>
+      {/* The "not yet passed" reminder now lives inside RSVPSection, right
+          under its heading, so the deadline sits next to the action it
+          gates instead of being repeated in its own section. This standalone
+          block only remains for the passed-deadline state, since RSVPSection
+          doesn't render once the deadline is gone. */}
+      {isPersonalized && config?.deadline && deadlinePassed && (
+        <section style={{ maxWidth: 640, margin: '0 auto', padding: 'clamp(64px,12vw,100px) clamp(20px,5vw,28px) clamp(48px,10vw,72px)' }}>
           <div
             style={{
               textAlign: 'center',
-              padding: 'clamp(24px,5vw,40px)',
-              background: deadlinePassed ? '#fdf2f0' : '#fffdfb',
-              border: `1px solid ${deadlinePassed ? '#e0b8ab' : c.border}`,
-              borderTop: `3px solid ${deadlinePassed ? '#b3543f' : c.gold}`,
+              padding: 'clamp(30px,6vw,52px)',
+              background: '#fdf2f0',
+              border: '1px solid #e0b8ab',
+              borderTop: '5px solid #b3543f',
             }}
           >
-            {deadlinePassed ? (
-              <>
-                <div className="font-label" style={{ fontSize: 12, color: '#b3543f' }}>Fecha límite vencida</div>
-                <p style={{ fontSize: 19, lineHeight: 1.6, color: c.textBody, margin: '14px 0 0' }}>
-                  El plazo para confirmar asistencia concluyó el <strong style={{ fontFamily: TIMES }}>{formatShortDate(config.deadline)}</strong>. Sus lugares han sido cedidos a otras personas.
-                </p>
-              </>
-            ) : (
-              <>
-                <div className="font-label" style={{ fontSize: 12, color: c.goldLabel }}>Fecha límite de confirmación</div>
-                <p style={{ fontFamily: TIMES, fontSize: 'clamp(26px,4vw,34px)', fontStyle: 'italic', color: c.accent, margin: '12px 0 0' }}>{formatShortDate(config.deadline)}</p>
-                <p style={{ fontSize: 17, lineHeight: 1.6, color: c.mutedFaint, margin: '14px 0 0' }}>
-                  Le solicitamos amablemente confirmar su asistencia antes de la fecha indicada. En caso de no recibir respuesta, sus lugares serán cedidos a otras personas.
-                </p>
-              </>
-            )}
+            <div className="font-label" style={{ fontSize: 13, color: '#b3543f', fontWeight: 700 }}>Fecha límite vencida</div>
+            <p style={{ fontSize: 19, lineHeight: 1.6, color: c.textBody, margin: '14px 0 0' }}>
+              El plazo para confirmar asistencia concluyó el <strong style={{ fontFamily: TIMES }}>{formatShortDate(config.deadline)}</strong>. Sus lugares han sido cedidos a otras personas.
+            </p>
           </div>
         </section>
       )}
@@ -173,7 +167,11 @@ export default function InvitationView({
       )}
 
       {isPersonalized && invitation && !deadlinePassed && !isResponded && (
-        <RSVPSection invitation={invitation} deadline={config?.deadline || null} />
+        <RSVPSection
+          invitation={invitation}
+          deadline={config?.deadline || null}
+          deadlineInvalidationMessage={config?.deadlineInvalidationMessage}
+        />
       )}
 
       {isPersonalized && invitation && isResponded && (
@@ -382,12 +380,9 @@ function Invitados({ invitation }: { invitation: InvitationData }) {
         </div>
         {invitation.persons.length > 1 && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            {invitation.persons.map(p => (
+            {sortAdultsFirst(invitation.persons).map(p => (
               <div key={p.id} style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 16, padding: '15px 0', borderBottom: `1px solid ${c.borderFaint}` }}>
                 <span style={{ fontSize: 'clamp(22px,4vw,28px)', fontWeight: 400, color: c.text }}>{p.name}</span>
-                {p.isChild && (
-                  <span className="font-label" style={{ fontSize: 11, color: c.labelDim }}>Menor de 8 años</span>
-                )}
               </div>
             ))}
           </div>
@@ -531,7 +526,7 @@ function Footer({ eventDate }: { eventDate: string }) {
         <span className="font-label" style={{ fontFamily: TIMES, fontSize: 12, color: c.footerGold }}>{formatShortDate(eventDate)}</span>
         <span style={{ width: 40, height: 1, background: c.gold }} />
       </div>
-      <p style={{ margin: '20px 0 0', fontSize: 20, fontStyle: 'italic' }}>Noe &amp; Esme</p>
+      <p style={{ margin: '20px 0 0', fontSize: 20, fontStyle: 'italic' }}>Esmeralda &amp; Noe</p>
       <p className="font-label" style={{ margin: '18px 0 0', fontSize: 11, color: '#d9c2b3', letterSpacing: '0.1em' }}>Les esperamos con todo nuestro amor.</p>
     </footer>
   )

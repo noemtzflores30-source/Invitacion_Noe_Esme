@@ -61,7 +61,7 @@ export default function DashboardClient({
       <div>
         <h1 className="font-serif text-3xl" style={{ color: 'var(--brown-dark)' }}>Dashboard</h1>
         <p className="text-sm mt-1" style={{ color: 'var(--brown-mid)' }}>
-          Gestión de invitados — Boda Noe &amp; Esme
+          Gestión de invitados — Boda Esmeralda &amp; Noe
         </p>
       </div>
 

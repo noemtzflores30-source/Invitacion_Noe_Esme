@@ -41,7 +41,7 @@ export default function LoginPage() {
             <div className="h-px w-12" style={{ background: 'var(--gold)' }} />
           </div>
           <h1 className="font-serif text-4xl mb-2" style={{ color: 'var(--brown-dark)' }}>
-            Noe &amp; Esme
+            Esmeralda &amp; Noe
           </h1>
           <p className="text-sm tracking-widest uppercase" style={{ color: 'var(--gold-dark)' }}>
             Panel de Administración
